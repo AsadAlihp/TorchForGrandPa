@@ -10,44 +10,45 @@ import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.util.Log;
 
 public class torchservice extends Service implements Shaker.OnShakeListener {
 
 
+    private Shaker mShaker;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    private Shaker mShakeDetector;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
     }
 
     public void onCreate() {
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mShakeDetector = new Shaker();
 
         super.onCreate();
-
-    }
-
-
-
-
-
-   public int onStartCommand(Intent intent, int flags, int startId) {
-      Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-       vibrator.vibrate(2000);
-
-       return super.onStartCommand(intent, flags, startId);
-
-
-
+        this.mSensorManager = ((SensorManager)getSystemService(SENSOR_SERVICE));
+        this.mAccelerometer = this.mSensorManager.getDefaultSensor(1);
+        mShaker = new Shaker(this);
+        mShaker.setOnShakeListener(this);
     }
 
     @Override
-    public void onShake(int count) {
+    public void onShake() {
+        Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+        v.vibrate(400);
+// Vibrate for 400 milliseconds
+       //
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        super.onStartCommand(intent, flags, startId);
+
+        //your code here
+
+        return START_STICKY;
+
 
     }
 }

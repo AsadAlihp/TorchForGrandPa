@@ -10,58 +10,100 @@ import android.hardware.SensorManager;
 /**
  * Created by asad on 5/21/16.
  */
-public class Shaker implements SensorEventListener {
-    private static final float SHAKE_THRESHOLD_GRAVITY = 2.7F;
-    private static final int SHAKE_SLOP_TIME_MS = 500;
-    private static final int SHAKE_COUNT_RESET_TIME_MS = 3000;
+import java.util.ArrayList;
+import java.util.List;
 
-    private OnShakeListener mListener;
-    private long mShakeTimestamp;
-    private int mShakeCount;
+/**
+ * Detects phone shaking. If > 75% of the samples taken in the past 0.5s are
+ * accelerating, the device is a) shaking, or b) free falling 1.84m (h =
+ * 1/2*g*t^2*3/4).
+ *
+ * @author Bob Lee (bob@squareup.com)
+ * @author Eric Burke (eric@squareup.com)
+ */
 
-    public void setOnShakeListener(OnShakeListener listener){
-        this.mListener = listener;
+
+
+public class Shaker implements SensorListener
+{
+    private static final int FORCE_THRESHOLD = 350;
+    private static final int TIME_THRESHOLD = 200;
+    private static final int SHAKE_TIMEOUT = 500;
+    private static final int SHAKE_DURATION = 1000;
+    private static final int SHAKE_COUNT = 3;
+
+    private SensorManager mSensorMgr;
+    private float mLastX=-1.0f, mLastY=-1.0f, mLastZ=-1.0f;
+    private long mLastTime;
+    private OnShakeListener mShakeListener;
+    private Context mContext;
+    private int mShakeCount = 0;
+    private long mLastShake;
+    private long mLastForce;
+
+    public interface OnShakeListener
+    {
+        public void onShake();
     }
 
-    public interface OnShakeListener{
-        public void onShake(int count);
+    public  Shaker(Context context)
+    {
+        mContext = context;
+        resume();
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy){
-        // ignore
+    public void setOnShakeListener(OnShakeListener listener)
+    {
+        mShakeListener = listener;
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event){
+    public void resume() {
+        mSensorMgr = (SensorManager)mContext.getSystemService(Context.SENSOR_SERVICE);
+        if (mSensorMgr == null) {
+            throw new UnsupportedOperationException("Sensors not supported");
+        }
+        boolean supported = mSensorMgr.registerListener(this, SensorManager.SENSOR_ACCELEROMETER, SensorManager.SENSOR_DELAY_GAME);
+        if (!supported) {
+            mSensorMgr.unregisterListener(this, SensorManager.SENSOR_ACCELEROMETER);
+            throw new UnsupportedOperationException("Accelerometer not supported");
+        }
+    }
 
-        if (mListener != null){
-            float x = event.values[0];
-            float y = event.values[1];
-            float z = event.values[2];
+    public void pause() {
+        if (mSensorMgr != null) {
+            mSensorMgr.unregisterListener(this, SensorManager.SENSOR_ACCELEROMETER);
+            mSensorMgr = null;
+        }
+    }
 
-            float gX = x / SensorManager.GRAVITY_EARTH;
-            float gY = y / SensorManager.GRAVITY_EARTH;
-            float gZ = z / SensorManager.GRAVITY_EARTH;
+    public void onAccuracyChanged(int sensor, int accuracy) { }
 
-            float gForce = (float) Math.sqrt(gX * gX + gY * gY + gZ *gZ);
+    public void onSensorChanged(int sensor, float[] values)
+    {
+        if (sensor != SensorManager.SENSOR_ACCELEROMETER) return;
+        long now = System.currentTimeMillis();
 
-            if (gForce > SHAKE_THRESHOLD_GRAVITY){
-                final long now = System.currentTimeMillis();
+        if ((now - mLastForce) > SHAKE_TIMEOUT) {
+            mShakeCount = 0;
+        }
 
-                if (mShakeTimestamp + SHAKE_SLOP_TIME_MS > now){
-                    return;
-                }
-
-                if (mShakeTimestamp + SHAKE_COUNT_RESET_TIME_MS < now){
+        if ((now - mLastTime) > TIME_THRESHOLD) {
+            long diff = now - mLastTime;
+            float speed = Math.abs(values[SensorManager.DATA_X] + values[SensorManager.DATA_Y] + values[SensorManager.DATA_Z] - mLastX - mLastY - mLastZ) / diff * 10000;
+            if (speed > FORCE_THRESHOLD) {
+                if ((++mShakeCount >= SHAKE_COUNT) && (now - mLastShake > SHAKE_DURATION)) {
+                    mLastShake = now;
                     mShakeCount = 0;
+                    if (mShakeListener != null) {
+                        mShakeListener.onShake();
+                    }
                 }
-
-                mShakeTimestamp = now;
-                mShakeCount++;
-
-                mListener.onShake(mShakeCount);
+                mLastForce = now;
             }
+            mLastTime = now;
+            mLastX = values[SensorManager.DATA_X];
+            mLastY = values[SensorManager.DATA_Y];
+            mLastZ = values[SensorManager.DATA_Z];
         }
     }
 
