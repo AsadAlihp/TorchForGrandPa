@@ -12,8 +12,19 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.hardware.Camera;
+import android.hardware.Camera.Parameters;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity {
+    private boolean hasFlash;//-------------------flash LIGHT (FOR AVAILABILITY CHECK)
     private Shaker shaker;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +46,28 @@ public class MainActivity extends AppCompatActivity {
                 //starting service above
             }
         });
+
+        //-------CHECKING FLASH LIGHT AVAILABILITY=====down
+        hasFlash = getApplicationContext().getPackageManager()
+                .hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+
+        if (!hasFlash) {
+            // device doesn't support flash
+            // Show alert message and close the application
+            AlertDialog alert = new AlertDialog.Builder(MainActivity.this)
+                    .create();
+            alert.setTitle("Error");
+            alert.setMessage("Sorry, your device doesn't support flash light!");
+            alert.setButton("OK", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    // closing the application
+                    finish();
+                }
+            });
+            alert.show();
+            return;
+        }
+        //-------CHECKING FLASH LIGHT AVAILABILITY-===above
     }
 
     @Override
