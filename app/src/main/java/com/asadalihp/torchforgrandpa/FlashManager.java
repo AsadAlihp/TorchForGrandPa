@@ -36,7 +36,7 @@ public class FlashManager {
 
     public void turnFlashON() {
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             try {
                 camera = Camera.open();
             } catch (Exception e) {
@@ -44,7 +44,7 @@ public class FlashManager {
                 e.printStackTrace();
             }
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             try {
                 parameters = camera.getParameters();
             } catch (Exception e) {
@@ -52,7 +52,7 @@ public class FlashManager {
                 e.printStackTrace();
             }
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             try {
                 parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
 
@@ -61,7 +61,7 @@ public class FlashManager {
                 e.printStackTrace();
             }
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             try {
                 camera.setParameters(parameters);
 
@@ -70,7 +70,7 @@ public class FlashManager {
                 e.printStackTrace();
             }
         }
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 30; i++) {
             try {
                 camera.startPreview();
             } catch (Exception e) {
@@ -92,19 +92,20 @@ public class FlashManager {
     public void turnFlashOFF() {
 
         if (camera != null) {
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 30; i++) {
                 try {
                     camera.stopPreview();
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.e("000000000", "=========================================can't stop Preview!!!===" + i);
                 }
             }
 
-            for (int i = 0; i < 20; i++) {
+            for (int i = 0; i < 30; i++) {
                 try {
                     camera.release();
                 } catch (Exception e) {
-                    Log.e("--camera", "can't release");
+                    Log.e("000000000", "=========================================can't release camera!!!===" + i);
                 }
             }
             currentPower = LightPower.OFF;
