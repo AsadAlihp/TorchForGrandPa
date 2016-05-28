@@ -7,37 +7,28 @@ package com.asadalihp.torchforgrandpa;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Camera;
 import android.hardware.Camera.Parameters;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.IBinder;
 import android.os.Vibrator;
-import android.content.pm.PackageManager;
-import android.hardware.Camera.Parameters;
-import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnCompletionListener;
-import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
-import android.view.View;
 
 public class torchservice extends Service implements Shaker.OnShakeListener {
 
-    /*Declaration for flash light down*/
-    private int o = 0;
-    private boolean on = false;
-    private boolean repeating = false;
-    private boolean noFlash = false;
-    public FlashManager flfl;
     //flag to detect flash is on or off
     public static final String SERVICE_RUNNING = torchservice.class.getName() + ".PREF_SERVICE_RUNNING";
     public static final String ACTION_SERVICE_STOPPED = torchservice.class.getName() + ".ACTION_SERVICE_STOPPED";
-
     private static final String ACTION_STOP_REQUEST = torchservice.class.getName() + ".ACTION_STOP_REQUEST";
     private static final int SERVICE_ID = 79290;
-
+    public FlashManager flfl;
+    /*Declaration for flash light down*/
+    private int o = 0;
+    private int a = 0;
+    private boolean on = false;
+    private boolean repeating = false;
+    private boolean noFlash = false;
     private FlashManager mFlashManager = new FlashManager();
     private Camera camera;
     private boolean isFlashOn;
@@ -47,7 +38,6 @@ public class torchservice extends Service implements Shaker.OnShakeListener {
 
     private Shaker mShaker;
     private SensorManager mSensorManager;
-
 
 
     private Sensor mAccelerometer;
@@ -69,38 +59,40 @@ public class torchservice extends Service implements Shaker.OnShakeListener {
 
     @Override
     public void onShake() {
-        o++;//----------11
-        on = false;
+        Log.e("--------", "value of a = " + o);
         flfl = new FlashManager();
         Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
         //----------------
         //FLASH LIGHT-------------------------------------------BELOW
-        switch (o%2){
-            case 0:
-                if(!on) {
-                    flfl.setPower(FlashManager.LightPower.ON);
-                    on = true;
+
+        if (flfl.getPower() == FlashManager.LightPower.ON) {
+            v.vibrate(200);// Vibrate for 400 milliseconds
+            //for (int i = 0; i < 10; i++) {
+            try {
+                flfl.turnFlashOFF();
+            } catch (Exception e) {
+                e.printStackTrace();
                 }
-                break;
-            case 1:
-                if(on) {
-                    flfl.setPower(FlashManager.LightPower.OFF);
-                    on = false;
-                }
-                break;
+
+            // }
+            Log.e("----SERVICE---", "SWITCHING OFF.......");
         }
-        v.vibrate(200);// Vibrate for 400 milliseconds
+        if (flfl.getPower() == FlashManager.LightPower.OFF) {
+            v.vibrate(200);// Vibrate for 400 milliseconds
+            //for (int i = 0; i < 10; i++) {
+            try {
+                flfl.turnFlashON();
+            } catch (Exception e) {
+                e.printStackTrace();
+                }
+            //}
+        }
     }
 
-
-//-------------------------------------------FLASH LIGHT ABOVE
+    //-------------------------------------------FLASH LIGHT ABOVE
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-
-        //your code here
-//for FLASH LIGHT-------------------------------------------------------------FLASH LIGHT
 
 
         return START_STICKY;

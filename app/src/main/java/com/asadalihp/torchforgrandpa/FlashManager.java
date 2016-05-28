@@ -8,54 +8,108 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
+import android.util.Log;
 
 public class FlashManager {
 
-    public enum LightPower {
-        OFF, ON;
-    }
-//being used in others may be
+    public LightPower currentPower;
+    //being used in others may be
     private Camera camera;
     private Parameters parameters;
-    private LightPower currentPower;
 
     public static boolean isFlashAvailable(Context context) {
         return context.getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
     }
 
     public void release() {
-        setPower(LightPower.OFF);
+        Log.e("----RELEASE---", "---------STATUS---" + (currentPower == LightPower.OFF));
+        for (int i = 0; i < 10; i++) {
+            try {
+                setPower(LightPower.OFF);
+
+            } catch (Exception e) {
+                Log.e("----CAM-TFON-", "---------switching of by releasing");
+                e.printStackTrace();
+            }
+        }
     }
 
-    private void turnFlashON() {
-        camera = Camera.open();
-        parameters = camera.getParameters();
-        parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
-        camera.setParameters(parameters);
-        camera.startPreview();
-        currentPower = LightPower.ON;
+    public void turnFlashON() {
+
+        for (int i = 0; i < 20; i++) {
+            try {
+                camera = Camera.open();
+            } catch (Exception e) {
+                Log.e("----CAM-TFON-", "------------camera.open()");
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < 20; i++) {
+            try {
+                parameters = camera.getParameters();
+            } catch (Exception e) {
+                Log.e("----CAM-TFON-", "------------camera.getParameters()");
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < 20; i++) {
+            try {
+                parameters.setFlashMode(Parameters.FLASH_MODE_TORCH);
+
+            } catch (Exception e) {
+                Log.e("----CAM-TFON-", "------------FLASH_MODE_TORCH");
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < 20; i++) {
+            try {
+                camera.setParameters(parameters);
+
+            } catch (Exception e) {
+                Log.e("----CAM-TFON-", "------------SET PARAMETERS");
+                e.printStackTrace();
+            }
+        }
+        for (int i = 0; i < 20; i++) {
+            try {
+                camera.startPreview();
+            } catch (Exception e) {
+                Log.e("----CAM- TFON-", "-----------START PREVIEW");
+                e.printStackTrace();
+            }
+        }
+        try {
+            currentPower = LightPower.ON;
+        } catch (Exception e) {
+            Log.e("----CAM- TFON-", "---------setting status");
+            e.printStackTrace();
+        }
+
+
     }
 
-    private void turnFlashOFF() {
-        camera.stopPreview();
-        camera.release();
-        currentPower = LightPower.OFF;
-    }
 
-    public void setPower(LightPower value) {
-        switch (value) {
-            case ON:
-                if (getPower() == LightPower.OFF) {
-                    turnFlashON();
+    public void turnFlashOFF() {
+
+        if (camera != null) {
+            for (int i = 0; i < 20; i++) {
+                try {
+                    camera.stopPreview();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                break;
-            case OFF:
-                if (getPower() == LightPower.ON) {
-                    turnFlashOFF();//being turned offed
+            }
+
+            for (int i = 0; i < 20; i++) {
+                try {
+                    camera.release();
+                } catch (Exception e) {
+                    Log.e("--camera", "can't release");
                 }
-                break;
-            default:
-                break;
+            }
+            currentPower = LightPower.OFF;
+
+
         }
     }
 
@@ -64,6 +118,29 @@ public class FlashManager {
             return LightPower.OFF;
         }
         return currentPower;
+    }
+
+    public void setPower(LightPower value) {
+        switch (value) {
+            case ON:
+                if (getPower() == LightPower.OFF) {
+                    Log.e("---in CASE---", "--IS OFF case" + (getPower() == LightPower.OFF));
+                    turnFlashON();
+                }
+                break;
+            case OFF:
+                if (getPower() == LightPower.ON) {
+                    Log.e("---in CASE---", "-- iS on case" + (getPower() == LightPower.ON));
+                    turnFlashOFF();//being turned offed
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    public enum LightPower {
+        OFF, ON;
     }
 
 }

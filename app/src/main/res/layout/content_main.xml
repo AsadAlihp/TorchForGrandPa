@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -12,4 +13,91 @@
     tools:context="com.asadalihp.torchforgrandpa.MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <com.google.android.gms.ads.AdView
+        android:id="@+id/adView"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:foregroundGravity="center_vertical"
+        ads:adSize="BANNER"
+        ads:adUnitId="@string/admobid"></com.google.android.gms.ads.AdView>
+
+    <TextView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="false"
+        android:layout_alignParentTop="false"
+
+        android:layout_below="@+id/adView"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="10dp"
+        android:text="Getting Started"
+        android:textColor="#ffffff"
+        android:textIsSelectable="false"
+        android:textSize="25dp"
+        android:textStyle="bold|italic"
+        android:typeface="monospace" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/adView"
+        android:layout_below="@+id/imageView"
+        android:alpha=".9"
+        android:gravity="center"
+        android:text="Just shake (hard) your phone to turn on/off flash light even app is closed or your phone is locked doesn&apos;t matter: Happy lightening :)"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#ffffff"
+        android:textSize="15dp"
+        android:textStyle="normal|italic"
+        android:typeface="monospace" />
+
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:alpha=".5"
+        android:text="&lt;Hide  RateUs>"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="#ffffff"
+        android:textSize="10dp"
+        android:textStyle="italic" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_below="@+id/textView"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="34dp"
+        android:alpha=".5"
+        android:foregroundGravity="center"
+        android:src="@drawable/handshake" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/textView"
+        android:layout_alignRight="@+id/textView"
+        android:layout_alignTop="@+id/imageView"
+        android:clickable="true"
+        android:src="@android:drawable/ic_menu_share" />
+
+
+    <!--
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Flash On/Off"
+            android:id="@+id/tb"
+            android:layout_below="@+id/adView"
+            android:layout_centerHorizontal="true"
+            android:checked="false" />
+    -->
 </RelativeLayout>

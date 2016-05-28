@@ -1,17 +1,13 @@
 package com.asadalihp.torchforgrandpa;
 
 import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.util.Log;
 
 /**
  * Created by asad on 5/21/16.
  */
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Detects phone shaking. If > 75% of the samples taken in the past 0.5s are
@@ -40,11 +36,6 @@ public class Shaker implements SensorListener
     private int mShakeCount = 0;
     private long mLastShake;
     private long mLastForce;
-
-    public interface OnShakeListener
-    {
-        public void onShake();
-    }
 
     public  Shaker(Context context)
     {
@@ -95,7 +86,12 @@ public class Shaker implements SensorListener
                     mLastShake = now;
                     mShakeCount = 0;
                     if (mShakeListener != null) {
-                        mShakeListener.onShake();
+                        try {
+                            mShakeListener.onShake();
+                        } catch (Exception e) {
+                            Log.e("onShake error", "failed to SHAKE");
+                            e.printStackTrace();
+                        }
                     }
                 }
                 mLastForce = now;
@@ -105,6 +101,10 @@ public class Shaker implements SensorListener
             mLastY = values[SensorManager.DATA_Y];
             mLastZ = values[SensorManager.DATA_Z];
         }
+    }
+
+    public interface OnShakeListener {
+        public void onShake();
     }
 
 }
